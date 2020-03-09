@@ -37,7 +37,7 @@
     │   └── train_model.py
     │   └── calculate_performance_metrics.py
     │    
-    ├── d06_reporting  <- Scripts to a) produce reporting tables, and b) create plots
+    ├── d04_reporting  <- Scripts to a) produce reporting tables, and b) create plots
     │   └── create_summary_tables.py
     │   └── create_data_visualizations.py
 ```
