@@ -1,5 +1,83 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random
+import os
+import pandas as pd
+import glob
+
+def file_compressor(startdir, returndir = '../', extension = 'csv', rdm = 0, pathchange = True, percent = 1, export = False):
+    '''
+    Takes a folder full of files and downsizes into a single dataframe by taking a random sample.
+    This function was bult using the function pd_read_downsample from HelperFn.py
+    Requires importing random, os, pandas, glob.
+    
+    startdir = path directory to your desired files (such as csv)
+    df  = name of your product dataframe
+    
+    returndir will return your path directory to your orginal location.
+    extension is set to csv as default
+    Random (rdm) seed is set to 0 as default
+    pathchange controls the startpwd and returnpwd. Set this to false if yoour directory is already in list of files
+    Default downsizing is set to 1% of the data
+    If you want a csv copy set export to True.
+    --------------------------------------------------------------------------------------------
+    
+    Example:
+    file_compressor(startdir = 'foldername/anotherfldr', df = finished_df, returndir ='../..')
+    '''
+    if pathchange == True:
+        os.chdir( startdir )
+    random.seed(rdm)
+    extension = extension
+    df_list = []
+    percent = percent/100
+    all_filenames = [i for i in glob.glob('*.{}'.format(extension) )]
+    i = 1
+    for file in all_filenames:
+        df_downsample = pd_read_downsample(file, percent)
+        df_list.append(df_downsample)
+        print('csv {} completed'.format(i))
+        i += 1
+    
+    finished_df = pd.concat(df_list)
+    print('Dataframe variable is set as finished_df')
+    
+    if export == True:
+        df.to_csv( "combined_csv.csv", index=False, encoding='utf-8-sig') #encoding is for non-english languages
+        print('finished_df printed as combined_csv.csv' )
+    if pathchange == True:
+        os.chdir( returndir )
+    print('Complete!')
+    
+
+def pd_read_downsample(filename, per, parse_dates = ['starttime', 'stoptime'] ):
+    '''
+    Takes in a filename within the same directory as the ipython file and a decimal \
+    and returns a downsampled dataframe with the percentage of rows random sampled set by per
+    '''
+    n = sum(1 for line in open(filename)) - 1 #number of records in file (excludes header)
+    s = round(n*per)
+    skip = sorted( random.sample(range(1,n+1), n-s)) #the 0-indexed header will not be included in the skip list
+    df = pd.read_csv(filename, parse_dates= parse_dates, skiprows=skip)
+    return df
+
+
+def highest_NA(df):
+    '''
+    Visualizes NAs by column
+    '''
+    #select all the na values, sum them, sort descending
+    nans = df.isna().sum().sort_values(ascending=False)
+    #filter them for columns w/ na
+    nans = nans[nans > 0]
+    #create plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.grid()
+    ax.bar(nans.index, nans.values, zorder=2, color="#3f72af")
+    ax.set_ylabel("No. of missing values", labelpad=10)
+    ax.set_xlim(-0.6, len(nans) - 0.4)
+    ax.xaxis.set_tick_params(rotation=90)
+    plt.show()
 
 def colpercent(df):
     '''
