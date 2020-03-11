@@ -5,7 +5,15 @@ import os
 import pandas as pd
 import glob
 
-def file_compressor(startdir, returndir = '../', extension = 'csv', rdm = 0, pathchange = True, percent = 1, export = False):
+def file_compressor(startdir, 
+                    returndir = '../', 
+                    parse_dates = ['starttime', 'stoptime'], 
+                    extension = 'csv', 
+                    rdm = 0, 
+                    pathchange = True, 
+                    percent = 1, 
+                    export = False, 
+                    name ='combined_csv.csv'):
     '''
     Takes a folder full of files and downsizes into a single dataframe by taking a random sample.
     This function was bult using the function pd_read_downsample from HelperFn.py
@@ -23,7 +31,7 @@ def file_compressor(startdir, returndir = '../', extension = 'csv', rdm = 0, pat
     --------------------------------------------------------------------------------------------
     
     Example:
-    file_compressor(startdir = 'foldername/anotherfldr', df = finished_df, returndir ='../..')
+    file_compressor(startdir = 'dataFlder/csvFlder', returndir ='../..')
     '''
     if pathchange == True:
         os.chdir( startdir )
@@ -32,9 +40,10 @@ def file_compressor(startdir, returndir = '../', extension = 'csv', rdm = 0, pat
     df_list = []
     percent = percent/100
     all_filenames = [i for i in glob.glob('*.{}'.format(extension) )]
+    
     i = 1
     for file in all_filenames:
-        df_downsample = pd_read_downsample(file, percent)
+        df_downsample = pd_read_downsample(file, percent, parse_dates = parse_dates)
         df_list.append(df_downsample)
         print('csv {} completed'.format(i))
         i += 1
@@ -42,11 +51,11 @@ def file_compressor(startdir, returndir = '../', extension = 'csv', rdm = 0, pat
     finished_df = pd.concat(df_list)
     print('Dataframe variable is set as finished_df')
     
-    if export == True:
-        df.to_csv( "combined_csv.csv", index=False, encoding='utf-8-sig') #encoding is for non-english languages
-        print('finished_df printed as combined_csv.csv' )
     if pathchange == True:
         os.chdir( returndir )
+    if export == True:
+        finished_df.to_csv( name, index=False, encoding='utf-8-sig') #encoding is for non-english languages
+        print('finished_df printed as {}'.format(name) )
     print('Complete!')
     
 
