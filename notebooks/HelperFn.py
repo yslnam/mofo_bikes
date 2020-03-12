@@ -5,6 +5,9 @@ import os
 import pandas as pd
 import glob
 
+def test(a):
+    return a
+
 def file_compressor(startdir, 
                     returndir = '../', 
                     parse_dates = ['starttime', 'stoptime'], 
@@ -39,13 +42,23 @@ def file_compressor(startdir,
     extension = extension
     df_list = []
     percent = percent/100
-    all_filenames = [i for i in glob.glob('*.{}'.format(extension) )]
+    
+    # Uses glob fn from glob to match the extension pattern (csv). Written in regex
+    all_filenames = [i for i in glob.glob('*.{}'.format(extension) )] 
     
     i = 1
     for file in all_filenames:
-        df_downsample = pd_read_downsample(file, percent, parse_dates = parse_dates)
-        df_list.append(df_downsample)
-        print('csv {} completed'.format(i))
+        try:
+            n = sum(1 for line in open(file)) - 1 #number of records in file (excludes header)
+            s = round(n*percent)
+            skip = sorted( random.sample(range(1,n+1), n-s)) #the 0-indexed header will not be included in the skip list
+            df_downsample = pd.read_csv(file,skiprows=skip)
+            df_downsample.columns = df_downsample.columns.str.lower()
+            df_downsample.columns = df_downsample.columns.str.replace(' ','')
+            df_list.append(df_downsample)
+            print('csv {} completed:{}'.format(i, file))
+        except ValueError:
+            print('csv read error:{}'.format(file) )
         i += 1
     
     finished_df = pd.concat(df_list)
