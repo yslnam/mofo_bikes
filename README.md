@@ -10,9 +10,7 @@
 │   ├── 01_intermediate <- Cleaned version of raw
 │   ├── 02_processed    <- Data used for modelling
 │
-├── notebooks           <- Jupyter notebooks. Naming convention is date YYYYMMDD (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `20190601-jqp-initial-data-exploration`.
+├── notebooks           <- Jupyter notebooks
 │
 ├── models              <- Trained models and model output stored for local use
 │                                           
