@@ -1,6 +1,4 @@
 # Mofo Bikes
-
-
 ## Directory structure
 ```
 ├── README.md           <- Top-level README for project members
